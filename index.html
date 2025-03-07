@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store and Forward Testing Script</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script defer src="script.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        #checklist {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h2 {
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+        label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        input[type="text"] {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 300px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        #info-container {
+            background-color: #fff;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        #progress-bar-container {
+            width: 100%;
+            height: 20px;
+            background-color: #f3f3f3;
+            border-radius: 10px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        #progress-bar {
+            height: 100%;
+            background-color: #007bff;
+            border-radius: 10px;
+            width: 0%;
+        }
+    </style>
+</head>
+<body>
+	  <h1>Store and Forward Testing Script</h1>
+    <div id="checklist"></div>
+</body>
+</html>
