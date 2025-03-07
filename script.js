@@ -370,7 +370,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // Append date and time to the filename
         const formattedDate = currentDate.replace(/\//g, "-"); // Replace slashes with dashes
         const formattedTime = currentTime.replace(/:/g, "-"); // Replace colons with dashes
-        const fileName = `EMV_Testing_Checklist_${formattedDate}_${formattedTime}.pdf`;
+        const fileName = `EMV_Testing_Checklist_${qaName}_${formattedDate}_${formattedTime}.pdf`;
 
         doc.save(fileName); // Save the PDF with the updated filename
     }
