@@ -85,6 +85,25 @@ document.addEventListener("DOMContentLoaded", function () {
     nameInput.style.border = "1px solid #ccc";
     nameInput.style.borderRadius = "5px";
 
+    // Create input fields for hardware, firmware, and application version
+    const hardwareInput = createVersionInput("Hardware Version");
+    const firmwareInput = createVersionInput("Firmware Version");
+    const applicationInput = createVersionInput("Application Version");
+
+    // Helper function to create version input fields
+    function createVersionInput(placeholder) {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = placeholder;
+        input.style.marginBottom = "10px";
+        input.style.padding = "10px";
+        input.style.fontSize = "16px";
+        input.style.width = "200px";
+        input.style.border = "1px solid #ccc";
+        input.style.borderRadius = "5px";
+        return input;
+    }
+
     // Create the download button
     const downloadButton = document.createElement("button");
     downloadButton.textContent = "Download PDF";
@@ -100,6 +119,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Add the input and button to the container
     inputButtonContainer.appendChild(nameInput);
+    inputButtonContainer.appendChild(hardwareInput);
+    inputButtonContainer.appendChild(firmwareInput);
+    inputButtonContainer.appendChild(applicationInput);
     inputButtonContainer.appendChild(downloadButton);
 
     // Add the container to the body
@@ -294,31 +316,28 @@ document.addEventListener("DOMContentLoaded", function () {
     // Validate the checklist before generating the PDF
     function validateChecklist() {
         let isValid = true;
-        Object.keys(checkboxes).forEach(test => {
-            if (!checkboxes[test].checked && notes[test].value.trim() === "") {
-                isValid = false;
-                notes[test].style.border = "1px solid red"; // Highlight missing notes
-            } else {
-                notes[test].style.border = ""; // Reset border
-            }
-        });
+        //Object.keys(checkboxes).forEach(test => {
+        //    if (!checkboxes[test].checked && notes[test].value.trim() === "") {
+        //        isValid = false;
+        //        notes[test].style.border = "1px solid red"; // Highlight missing notes
+        //    } else {
+        //        notes[test].style.border = ""; // Reset border
+        //   }
+        //});
         return isValid;
     }
 
     // Generate the PDF
     function generatePDF() {
-        console.log("Generate PDF button clicked"); // Debug log
+        console.log("Generate PDF button clicked");
 
         // Validate QA Name
         const qaName = nameInput.value.trim();
-        console.log("QA Name:", qaName); // Debug log
-
         if (!qaName) {
-            console.log("QA Name is empty"); // Debug log
             errorMessage.textContent = "Please enter a QA Name before downloading the PDF.";
-            return; // Stop further execution
+            return;
         } else {
-            errorMessage.textContent = ""; // Clear error message if QA Name is entered
+            errorMessage.textContent = "";
         }
 
         // Validate checklist
@@ -339,6 +358,7 @@ document.addEventListener("DOMContentLoaded", function () {
             Object.keys(checkboxes).length) * 100
         ).toFixed(2);
 
+        // Set font and add metadata
         doc.setFont("helvetica");
         doc.setFontSize(10);
         doc.text(`Date: ${currentDate}    Time: ${currentTime}`, 10, y);
@@ -346,32 +366,55 @@ document.addEventListener("DOMContentLoaded", function () {
         doc.text(`Device/Public IP: ${publicIP}`, 10, y);
         y += 7;
         doc.text(`QA Name: ${qaName}`, 10, y);
+        y += 7;
+        doc.text(`Hardware Version: ${hardwareInput.value.trim() || "Not provided"}`, 10, y);
+        y += 7;
+        doc.text(`Firmware Version: ${firmwareInput.value.trim() || "Not provided"}`, 10, y);
+        y += 7;
+        doc.text(`Application Version: ${applicationInput.value.trim() || "Not provided"}`, 10, y);
         y += 10;
         doc.text(`Completion: ${completionPercentage}%`, 10, y);
         y += 10;
 
+        // Add title
         doc.setFontSize(14);
         doc.text("Store and Forward Testing Script", 10, y);
         y += 10;
 
+        // Add test cases
         doc.setFontSize(12);
+        const maxWidth = 180; // Maximum width for text before splitting into new lines
         testCases.forEach(section => {
             doc.text(section.category, 10, y);
             y += 7;
             section.tests.forEach(test => {
                 const checkboxMark = checkboxes[test].checked ? "[X]" : "[ ]";
                 const noteText = notes[test].value ? ` - Notes: ${notes[test].value}` : "";
-                doc.text(`${checkboxMark} ${test}${noteText}`, 15, y);
-                y += 6;
+
+                // Combine the test and notes
+                const fullText = `${checkboxMark} ${test}${noteText}`;
+
+                // Split the text into multiple lines if it exceeds the maximum width
+                const lines = doc.splitTextToSize(fullText, maxWidth);
+
+                // Add each line to the PDF
+                lines.forEach(line => {
+                    if (y > 280) { // Add a new page if the content exceeds the page height
+                        doc.addPage();
+                        y = 15; // Reset y position for the new page
+                    }
+                    doc.text(line, 15, y);
+                    y += 6; // Move to the next line
+                });
+                y += 5; // Add extra space between test cases
             });
-            y += 5;
+            y += 5; // Add extra space between sections
         });
 
-        // Append date and time to the filename
-        const formattedDate = currentDate.replace(/\//g, "-"); // Replace slashes with dashes
-        const formattedTime = currentTime.replace(/:/g, "-"); // Replace colons with dashes
+        // Save PDF
+        const formattedDate = currentDate.replace(/\//g, "-");
+        const formattedTime = currentTime.replace(/:/g, "-");
         const fileName = `EMV_Testing_Checklist_${qaName}_${formattedDate}_${formattedTime}.pdf`;
-
-        doc.save(fileName); // Save the PDF with the updated filename
+        doc.save(fileName);
     }
 });
